@@ -10,9 +10,10 @@ export default defineConfig({
     open: true,
     proxy: {
       '/graphql': {
-        target: 'http://localhost:3091',
+        target: 'http://localhost:3001',
         secure: false,
-        changeOrigin: true
+        changeOrigin: true,
+        ws: true,
       }
     }
   }
