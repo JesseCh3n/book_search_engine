@@ -16,14 +16,14 @@ const server = new ApolloServer({
 
 const startApolloServer = async () => {
   await server.start();
-  
+  console.log('hello1');
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   
   app.use('/graphql', expressMiddleware(server, {
     context: authMiddleware
   }));
-
+  console.log('hello2');
   // if we're in production, serve client/dist as static assets
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/dist')));
@@ -32,9 +32,11 @@ const startApolloServer = async () => {
       res.sendFile(path.join(__dirname, '../client/dist/index.html'));
     });
   } 
-
+  console.log('hello3');
   db.once('open', () => {
+    console.log('hello4');
     app.listen(PORT, () => {
+      console.log('hello5');
       console.log(`API server running on port ${PORT}!`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
     });
