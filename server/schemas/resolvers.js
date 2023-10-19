@@ -4,12 +4,14 @@ const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    me: async (_parent, _args, context) => {
+    me: async (parent, args, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id })
-        .select('-__v -password');
+        // return User.findOne({ _id: context.user._id })
+        // .select('-__v -password');
         // returns everything BUT password
+        const userInfo = await User.findOne({ _id: context.user._id }).select('-__v -password');
 
+        return userInfo;
       }
       throw AuthenticationError;
     },
@@ -21,7 +23,7 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    login: async (_parent, { email, password }) => {
+    login: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
 
       if (!user) {
@@ -38,22 +40,39 @@ const resolvers = {
 
       return { token, user };
     },
-    saveBook: async (_parent, { bookData }, context) => {
+    saveBook: async (parent, { bookData }, context) => {
+      console.log("savebook-0  ", context);
       if (context.user) {
-        return User.findOneAndUpdate(
-          { _id: userId },
-          { $addToSet: { savedBooks: { book: bookData } } },
-          { new: true, runValidators: true }
+        console.log("savebook-1  ", context.user);
+        // return User.findOneAndUpdate(
+        //   { _id: context.user._id },
+        //   { $addToSet: { savedBooks: { book: bookData } } },
+        //   { new: true, runValidators: true }
+        // );
+        const changedUser = await User.findByIdAndUpdate(
+          { _id: context.user._id },
+          { $push: { savedBooks: bookData } },
+          { new: true }
         );
+        console.log("savebook-2  ", context.user);
+        console.log("changeduser-1  ", changedUser);
+        return changedUser;
       }
       throw new AuthenticationError("Please login");
     },
-    removeBook: async (_parent, { bookId }, context) => {
-      return User.findOneAndUpdate(
+    removeBook: async (parent, { bookId }, context) => {
+      // return User.findOneAndUpdate(
+      //   { _id: context.user._id },
+      //   { $pull: { saveBookss: { _id: bookId } } },
+      //   { new: true }
+      // );
+      const changedUser = await User.findByIdAndUpdate(
         { _id: context.user._id },
         { $pull: { saveBookss: { _id: bookId } } },
         { new: true }
       );
+
+      return changedUser;
     },
   },
 };

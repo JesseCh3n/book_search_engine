@@ -17,9 +17,9 @@ import { GET_ME} from '../utils/queries';
 
 const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
-
+  console.log("hello");
   const { loading, data } = useQuery(GET_ME);
-  const [removeBook, { error }] = useMutation(REMOVE_BOOK);
+  const [removeBook] = useMutation(REMOVE_BOOK);
 
   const userData = data?.me || {};
 
